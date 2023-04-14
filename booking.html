@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BOOKING APPOINTMENT APP</title>
+  </head>
+  <body>
+    <form onsubmit="userDetails(event)">
+      <label>Name</label>
+      <input type="text" id="username" name="username" required />
+      <label>EmailId</label>
+      <input type="text" id="emailid" name="emailid" required />
+      <label>phone</label>
+      <input type="number" id="phone" name="phone" />
+      <button>Submit</button>
+    </form>
+    <ul id="listofusers"></ul>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.5/axios.min.js"></script>
+    <script>
+      async function userDetails(event) {
+        event.preventDefault();
+        const name = event.target.username.value;
+        const emailid = event.target.emailid.value;
+        const phone = event.target.phone.value;
+        const obj = {
+          name,
+          emailid,
+          phone,
+        };
+        console.log(obj);
+        try {
+          const response = await axios.post(
+            "http://localhost:4000/user/add-user",
+            obj
+          );
+          shownewuseronscreen(response.data);
+        } catch (error) {
+          document.body.innerHTML =
+            document.body.innerHTML + "<h4>something went wrong </h4>";
+          console.log(error);
+        }
+      }
+
+      window.addEventListener("DOMContentLoaded", async () => {
+        try {
+          const response = await axios.get(
+            "http://localhost:4000/user/get-users"
+          );
+          console.log(response);
+          response.data.forEach((user) => {
+            shownewuseronscreen(user);
+          });
+        } catch (error) {
+          console.log(error);
+        }
+      });
+
+      function shownewuseronscreen(user) {
+        console.log(user);
+        document.getElementById("emailid").value = "";
+        document.getElementById("username").value = "";
+        document.getElementById("phone").value = "";
+
+        const parentnode = document.getElementById("listofusers");
+        const childnode = `<li id=${user.id}> ${user.name}, ${user.emailid}
+                                <button onclick=deleteUser('${user.id}')> Delete user </button>
+                                <button onclick=edituser('${user.emailid}','${user.name}','${user.phone}',${user.id})> Edit User </button></li>`;
+        parentnode.innerHTML = parentnode.innerHTML + childnode;
+      }
+
+      async function deleteUser(userid) {
+        try {
+          await axios.delete(
+            `http://localhost:4000/user/delete-user/${userid}`
+          );
+          removeuserfromscreen(userid);
+        } catch (error) {
+          console.log(error);
+          res.sendStatus(500).json(err);
+        }
+      }
+
+      function removeuserfromscreen(userid) {
+        const parentnode = document.getElementById("listofusers");
+        const childnodeisdeleted = document.getElementById(userid);
+        parentnode.removeChild(childnodeisdeleted);
+      }
+
+      function edituser(emailid, name, phone, userid) {
+        document.getElementById("emailid").value = emailid;
+        document.getElementById("username").value = name;
+        document.getElementById("phone").value = phone;
+        deleteUser(userid);
+      }
+    </script>
+  </body>
+</html>

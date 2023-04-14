@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Booking Appointment Page</title>
+  </head>
+  <body>
+    <h1>Booking Appointment Page</h1>
+    <form onsubmit="submitUserDetails(event)">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required /><br /><br />
+      <label for="phone">Phone Number:</label>
+      <input type="tel" id="phone" name="phone" required /><br /><br />
+      <label for="email">Email ID:</label>
+      <input type="email" id="email" name="email" required /><br /><br />
+      <button type="submit">Submit</button>
+    </form>
+    <hr />
+    <h2>Users List</h2>
+    <table id="usersTable">
+      <tr>
+        <th>Name</th>
+        <th>Phone Number</th>
+        <th>Email ID</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>
+    </table>
+    <script>
+      let users = [];
+
+      function submitUserDetails(event) {
+        event.preventDefault();
+        const name = document.getElementById("name").value;
+        const phone = document.getElementById("phone").value;
+        const email = document.getElementById("email").value;
+        const user = { name, phone, email };
+        users.push(user);
+        displayUsers();
+        document.getElementById("name").value = "";
+        document.getElementById("phone").value = "";
+        document.getElementById("email").value = "";
+      }
+
+      function displayUsers() {
+        const usersTable = document.getElementById("usersTable");
+        usersTable.innerHTML = `
+          <tr>
+            <th>Name</th>
+            <th>Phone Number</th>
+            <th>Email ID</th>
+            <th>Edit</th>
+            <th>Delete</th>
+          </tr>
+        `;
+        users.forEach((user, index) => {
+          const row = document.createElement("tr");
+          const nameCell = document.createElement("td");
+          nameCell.textContent = user.name;
+          row.appendChild(nameCell);
+          const phoneCell = document.createElement("td");
+          phoneCell.textContent = user.phone;
+          row.appendChild(phoneCell);
+          const emailCell = document.createElement("td");
+          emailCell.textContent = user.email;
+          row.appendChild(emailCell);
+          const editCell = document.createElement("td");
+          const editButton = document.createElement("button");
+          editButton.textContent = "Edit";
+          editButton.onclick = () => editUser(index);
+          editCell.appendChild(editButton);
+          row.appendChild(editCell);
+          const deleteCell = document.createElement("td");
+          const deleteButton = document.createElement("button");
+          deleteButton.textContent = "Delete";
+          deleteButton.onclick = () => deleteUser(index);
+          deleteCell.appendChild(deleteButton);
+          row.appendChild(deleteCell);
+          usersTable.appendChild(row);
+        });
+      }
+
+      function editUser(index) {
+        const user = users[index];
+        document.getElementById("name").value = user.name;
+        document.getElementById("phone").value = user.phone;
+        document.getElementById("email").value = user.email;
+        deleteUser(index);
+      }
+
+      function deleteUser(index) {
+        users.splice(index, 1);
+        displayUsers();
+      }
+    </script>
+  </body>
+</html>
